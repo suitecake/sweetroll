@@ -5,7 +5,7 @@
     [CreateTime] DATETIME2 NOT NULL,
     [MemberId] INT NULL, 
     [Value] DECIMAL(15, 5) NULL, 
-    [Time] DATETIME2 NULL, 
+    [RecordTime] DATETIME2 NULL, 
     [ChampionId] INT NULL,
     CONSTRAINT [PK_SoloRecord] PRIMARY KEY ([Id]),
     CONSTRAINT [FK_SoloRecord_Member] FOREIGN KEY (MemberId) REFERENCES Member(Id),

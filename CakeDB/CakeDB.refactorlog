@@ -126,4 +126,18 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="LastProcessedGameTime" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="864e1f69-9910-438e-97b3-b10eefdf5963" ChangeDateTime="01/07/2023 18:02:49">
+    <Property Name="ElementName" Value="[dbo].[Season].[Descrip]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Season]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Description" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="fa89d0fb-5173-40ce-bc04-716f25e866dc" ChangeDateTime="01/07/2023 18:22:30">
+    <Property Name="ElementName" Value="[dbo].[SoloRecord].[Time]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[SoloRecord]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="RecordTime" />
+  </Operation>
 </Operations>

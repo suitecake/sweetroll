@@ -63,6 +63,7 @@
     <Build Include="SoloRecord.sql" />
     <Build Include="Champion.sql" />
     <Build Include="Pentakill.sql" />
+    <Build Include="Season.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="CakeDB.refactorlog" />

@@ -1,13 +1,15 @@
-﻿using System;
+﻿using RiotSharp.Endpoints.MatchEndpoint;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using Camille.RiotGames.MatchV5;
-
 namespace CakeAF
 {
+    /// <summary>
+    /// Functions for determining whether team record has been set
+    /// </summary>
     public class TeamRecordService
     {
         private readonly DbCache cache;

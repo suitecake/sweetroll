@@ -1,58 +1,55 @@
+﻿using CakeAF.Entity;
+using Microsoft.Azure.WebJobs;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
-
-using Microsoft.Azure.WebJobs;
+using System.Transactions;
+using System.Configuration;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
-
-using Camille.Enums;
-using Camille.RiotGames;
-using Camille.RiotGames.MatchV5;
-
-using CakeAF.Entity;
+using RiotSharp;
+using RiotSharp.Misc;
+using RiotSharp.Endpoints.MatchEndpoint;
 
 namespace CakeAF
 {
-    public class Heartbeat
+    internal class GameProcessor
     {
         private TeamRecordService teamRecordService = null;
 
         private readonly DbCache cache = new DbCache();
+        
         private const int MinimumParticipantCountForQuorum = 4;
 
-        [FunctionName("Heartbeat")]
+        private readonly string riotApiKey = ConfigurationManager.AppSettings["ApiKey"];
+
+        [FunctionName("GameProcessor")]
         public async Task Run([TimerTrigger("0 */3 * * * *")] TimerInfo myTimer, ILogger log)
         {
             using (var dbContext = new CakeDBContext())
             {
-                await ProcessMatches(dbContext);
-                await dbContext.SaveChangesAsync();                
-                await ReportRecords();
+                var games = ProcessGameData(dbContext);
             }
         }
 
-        private async Task ProcessMatches(CakeDBContext dbContext)
+        private async Task ProcessGameData(CakeDBContext dbContext)
         {
-            var riotApi = RiotGamesApi.NewInstance(
-                new RiotGamesApiConfig.Builder(ConfigurationManager.AppSettings["ApiKey"])
-                {
-                    Retries = 5
-                }.Build()
-            );
+            var riotApi = RiotApi.GetDevelopmentInstance(riotApiKey);
 
             cache.Members = await dbContext.Members.ToListAsync();
 
             foreach (var member in cache.Members)
             {
-                var matchIds = await riotApi.MatchV5().GetMatchIdsByPUUIDAsync(
-                    RegionalRoute.AMERICAS, member.Puuid, start: (int)member.LastProcessedGameTime, count: 5);
+                var matchIds = await riotApi.Match.GetMatchListAsync(Region.Na,
+                    member.Puuid,
+                    start: member.LastProcessedGameTime,
+                    count: 5);
 
                 foreach (var matchId in matchIds)
                 {
-                    var match = await riotApi.MatchV5().GetMatchAsync(RegionalRoute.AMERICAS, matchId);
+                    var match = await riotApi.Match.GetMatchAsync(Region.Na, matchId);
                     if (IsQuorumMatch(match))
                     {
                         await CheckForRecords(dbContext, match);
@@ -75,7 +72,7 @@ namespace CakeAF
             }
         }
 
-        private async Task CheckTeamRecords(Match match, DbCache cache)
+        private async Task CheckTeamRecords(Match match)
         {
 
         }
@@ -95,7 +92,6 @@ namespace CakeAF
                     MemberId = cache.Members.Single(x => x.Puuid == participant.Puuid).Id,
                     Time = DateTime.UtcNow
                 };
-
                 dbContext.Pentakills.Add(pentakill);
             }
         }
